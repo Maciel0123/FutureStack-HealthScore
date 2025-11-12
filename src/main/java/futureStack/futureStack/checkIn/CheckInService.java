@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CheckInService {
@@ -71,4 +72,32 @@ public class CheckInService {
                 .filter(c -> !c.getDate().isBefore(startDate))
                 .toList();
     }
+
+    public CheckInStatisticsDTO getStatistics(Long userId) {
+    var checkIns = repository.findByUserIdOrderByDateDesc(userId);
+
+    if (checkIns.isEmpty()) {
+        return new CheckInStatisticsDTO(0, 0, 0, 0, 0);
+    }
+
+    double avgMood = checkIns.stream().mapToInt(CheckInModel::getMood).average().orElse(0);
+    double avgEnergy = checkIns.stream().mapToInt(CheckInModel::getEnergy).average().orElse(0);
+    double avgSleep = checkIns.stream().mapToInt(CheckInModel::getSleep).average().orElse(0);
+    double avgFocus = checkIns.stream().mapToInt(CheckInModel::getFocus).average().orElse(0);
+    double avgScore = checkIns.stream().mapToInt(CheckInModel::getScore).average().orElse(0);
+
+    return new CheckInStatisticsDTO(
+            Math.round(avgMood * 10.0) / 10.0,
+            Math.round(avgEnergy * 10.0) / 10.0,
+            Math.round(avgSleep * 10.0) / 10.0,
+            Math.round(avgFocus * 10.0) / 10.0,
+            Math.round(avgScore * 10.0) / 10.0
+    );
+}
+
+    public Double getMonthlyAverage(Long userId) {
+    LocalDate startOfMonth = LocalDate.now().withDayOfMonth(1);
+    return repository.findAverageScoreSince(userId, startOfMonth);
+}
+
 }
