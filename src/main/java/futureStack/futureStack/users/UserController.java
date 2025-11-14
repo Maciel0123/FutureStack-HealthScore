@@ -27,8 +27,12 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<User>> buscarPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(repository.findById(id));
+    public ResponseEntity<User> buscarPorId(@PathVariable Long id) {
+        var user = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        return ResponseEntity.ok(user);
+
     }
 
     @PostMapping

@@ -1,13 +1,22 @@
 package futureStack.futureStack.checkIn;
 
-public record CheckInResponseDTO(
-        Long id,
-        String date,
-        int mood,
-        int energy,
-        int sleep,
-        int focus,
-        int hoursWorked,
-        int score,
-        String message
-) {}
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class CheckInResponseDTO {
+    public Long id;
+    public String date;
+    public int mood;
+    public int energy;
+    public int sleep;
+    public int focus;
+    public int hoursWorked;
+    public int score;
+    public String message;
+}

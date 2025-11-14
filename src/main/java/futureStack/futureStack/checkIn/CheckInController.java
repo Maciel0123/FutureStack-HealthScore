@@ -4,8 +4,11 @@ import futureStack.futureStack.users.User;
 import futureStack.futureStack.users.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -33,19 +36,19 @@ public class CheckInController {
         var saved = checkInService.createCheckIn(user, dto);
         var message = calculator.getScoreMessage(saved.getScore());
 
-        return ResponseEntity.ok(
-                new CheckInResponseDTO(
-                        saved.getId(),
-                        saved.getDate().toString(),
-                        saved.getMood(),
-                        saved.getEnergy(),
-                        saved.getSleep(),
-                        saved.getFocus(),
-                        saved.getHoursWorked(),
-                        saved.getScore(),
-                        message
-                )
+        var response = new CheckInResponseDTO(
+                saved.getId(),
+                saved.getDate().toString(),
+                saved.getMood(),
+                saved.getEnergy(),
+                saved.getSleep(),
+                saved.getFocus(),
+                saved.getHoursWorked(),
+                saved.getScore(),
+                message
         );
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping

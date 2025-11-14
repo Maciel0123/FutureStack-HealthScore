@@ -3,6 +3,7 @@ package futureStack.futureStack.recommendation;
 import futureStack.futureStack.checkIn.CheckInService;
 import futureStack.futureStack.users.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ public class RecommendationController {
     private CheckInService checkInService;
 
     @GetMapping("/latest")
+    @Cacheable(value = "recommendations", key = "#score")
     public ResponseEntity<?> getLatestRecommendation(@AuthenticationPrincipal User user) {
         var checkIns = checkInService.getUserCheckIns(user.getId());
         if (checkIns.isEmpty()) {

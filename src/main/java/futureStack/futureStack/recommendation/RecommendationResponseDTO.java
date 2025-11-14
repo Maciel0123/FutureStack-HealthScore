@@ -1,7 +1,17 @@
 package futureStack.futureStack.recommendation;
 
-public record RecommendationResponseDTO(
-        String message,
-        int score,
-        String date
-) {}
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class RecommendationResponseDTO {
+
+    private String message;
+    private int score;
+    private String date;
+}
