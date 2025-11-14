@@ -22,7 +22,7 @@ public class CheckInService {
 
     @CacheEvict(value = "userCheckIns", key = "#user.idUser")
     public CheckInModel createCheckIn(User user, CheckInRequestDTO dto) {
-        if (repository.findByUserIdAndDate(user.getIdUser(), LocalDate.now()).isPresent()) {
+        if (repository.findByUser_IdAndDate(user.getId(), LocalDate.now()).isPresent()) {
             throw new RuntimeException("Check-in já realizado hoje");
         }
 
@@ -49,11 +49,11 @@ public class CheckInService {
 
     @Cacheable(value = "userCheckIns", key = "#userId")
     public List<CheckInModel> getUserCheckIns(Long userId) {
-        return repository.findByUserIdOrderByDateDesc(userId);
+        return repository.findByUser_IdOrderByDateDesc(userId);
     }
 
     public Page<CheckInModel> getUserCheckInsPaginated(Long userId, Pageable pageable) {
-        return repository.findByUserIdOrderByDateDesc(userId, pageable);
+        return repository.findByUser_IdOrderByDateDesc(userId, pageable);
     }
 
     public Double getWeeklyAverage(Long userId) {
@@ -61,12 +61,12 @@ public class CheckInService {
     }
 
     public CheckInModel getTodayCheckIn(Long userId) {
-        return repository.findByUserIdAndDate(userId, LocalDate.now()).orElse(null);
+        return repository.findByUser_IdAndDate(userId, LocalDate.now()).orElse(null);
     }
 
     public List<CheckInModel> getHistory(Long userId, int days) {
         LocalDate startDate = LocalDate.now().minusDays(days);
-        return repository.findByUserIdOrderByDateDesc(userId)
+        return repository.findByUser_IdOrderByDateDesc(userId)
                 .stream()
                 .filter(c -> !c.getDate().isBefore(startDate))
                 .toList();

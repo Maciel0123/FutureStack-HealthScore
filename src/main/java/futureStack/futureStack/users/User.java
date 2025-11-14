@@ -19,7 +19,7 @@ import java.util.List;
 public class User implements UserDetails {
     @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idUser;
+    private Long id;
 
     @NotBlank(message = "campo obrigatório")
     @Pattern(regexp = "^[A-Z].*", message = "deve começar com maiúscula")

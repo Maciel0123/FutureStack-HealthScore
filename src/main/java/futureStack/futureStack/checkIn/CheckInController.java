@@ -52,7 +52,7 @@ public class CheckInController {
             @AuthenticationPrincipal User user,
             Pageable pageable
     ) {
-        Page<CheckInModel> checkIns = checkInService.getUserCheckInsPaginated(user.getIdUser(), pageable);
+        Page<CheckInModel> checkIns = checkInService.getUserCheckInsPaginated(user.getId(), pageable);
         return ResponseEntity.ok(checkIns.map(c ->
                 new CheckInResponseDTO(
                         c.getId(),
@@ -70,7 +70,7 @@ public class CheckInController {
 
     @GetMapping("/score/today")
     public ResponseEntity<?> getTodayScore(@AuthenticationPrincipal User user) {
-        var checkin = checkInService.getTodayCheckIn(user.getIdUser());
+        var checkin = checkInService.getTodayCheckIn(user.getId());
         if (checkin == null) return ResponseEntity.noContent().build();
 
         var message = calculator.getScoreMessage(checkin.getScore());
@@ -92,7 +92,7 @@ public class CheckInController {
             @AuthenticationPrincipal User user,
             @RequestParam(defaultValue = "7") int days
     ) {
-        var checkins = checkInService.getHistory(user.getIdUser(), days);
+        var checkins = checkInService.getHistory(user.getId(), days);
         var response = checkins.stream()
                 .map(c -> new CheckInResponseDTO(
                         c.getId(),
@@ -111,13 +111,13 @@ public class CheckInController {
 
     @GetMapping("/weekly-average")
     public ResponseEntity<Double> weeklyAverage(@AuthenticationPrincipal User user) {
-        Double avg = checkInService.getWeeklyAverage(user.getIdUser());
+        Double avg = checkInService.getWeeklyAverage(user.getId());
         return ResponseEntity.ok(avg != null ? avg : 0.0);
     }
 
     @GetMapping("/last")
     public ResponseEntity<CheckInResponseDTO> last(@AuthenticationPrincipal User user) {
-        var checkIns = checkInService.getUserCheckIns(user.getIdUser());
+        var checkIns = checkInService.getUserCheckIns(user.getId());
         if (checkIns.isEmpty()) {
             return ResponseEntity.noContent().build();
         }

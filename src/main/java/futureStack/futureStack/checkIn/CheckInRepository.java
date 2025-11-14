@@ -14,11 +14,11 @@ import java.util.Optional;
 @Repository
 public interface CheckInRepository extends JpaRepository<CheckInModel, Long> {
 
-    List<CheckInModel> findByUserIdOrderByDateDesc(Long userId);
+    List<CheckInModel> findByUser_IdOrderByDateDesc(Long userId);
 
-    Page<CheckInModel> findByUserIdOrderByDateDesc(Long userId, Pageable pageable);
+    Page<CheckInModel> findByUser_IdOrderByDateDesc(Long userId, Pageable pageable);
 
-    Optional<CheckInModel> findByUserIdAndDate(Long userId, LocalDate date);
+    Optional<CheckInModel> findByUser_IdAndDate(Long userId, LocalDate date);
 
     @Query("SELECT AVG(c.score) FROM CheckInModel c WHERE c.user.id = :userId AND c.date >= :startDate")
     Double findAverageScoreSince(@Param("userId") Long userId, @Param("startDate") LocalDate startDate);
