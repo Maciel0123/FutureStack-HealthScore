@@ -8,6 +8,8 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -28,12 +30,25 @@ public class CheckInController {
     @Autowired
     private WScoreCalculator calculator;
 
+    @Autowired
+    private CheckInProducer producer;
+
     @PostMapping
     public ResponseEntity<CheckInResponseDTO> create(
             @AuthenticationPrincipal User user,
             @Valid @RequestBody CheckInRequestDTO dto
     ) {
         var saved = checkInService.createCheckIn(user, dto);
+
+        producer.sendCheckInEvent(
+                new CheckInEventDTO(
+                        saved.getUser().getId(),
+                        saved.getId(),
+                        saved.getScore(),
+                        saved.getDate().toString()
+                )
+        );
+
         var message = calculator.getScoreMessage(saved.getScore());
 
         var response = new CheckInResponseDTO(
@@ -54,7 +69,7 @@ public class CheckInController {
     @GetMapping
     public ResponseEntity<Page<CheckInResponseDTO>> list(
             @AuthenticationPrincipal User user,
-            Pageable pageable
+            @PageableDefault(sort = "date", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         Page<CheckInModel> checkIns =
                 checkInService.getUserCheckInsPaginated(user.getId(), pageable);

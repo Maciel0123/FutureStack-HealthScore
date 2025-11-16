@@ -1,4 +1,4 @@
-package futureStack.futureStack.Chat;
+package futureStack.futureStack.chat;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,4 +1,4 @@
-package futureStack.futureStack.Chat;
+package futureStack.futureStack.chat;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.openai.OpenAiChatOptions;

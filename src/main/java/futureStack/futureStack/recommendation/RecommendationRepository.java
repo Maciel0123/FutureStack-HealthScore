@@ -8,5 +8,7 @@ import java.util.List;
 
 @Repository
 public interface RecommendationRepository extends JpaRepository<RecommendationModel, Long> {
-    List<RecommendationModel> findByUserOrderByDateDesc(User user);
+    List<RecommendationModel> findByUserId(Long userId);
+
+    RecommendationModel findByCheckInId(Long checkInId);
 }

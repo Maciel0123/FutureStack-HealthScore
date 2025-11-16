@@ -23,11 +23,14 @@ public class RecommendationModel {
     @ManyToOne
     private User user;
 
+    private Long checkInId;
+
     private LocalDate date;
 
     private int score;
 
-    private String message;
+    @Column(columnDefinition = "TEXT")
+    private String text;
 
     @PrePersist
     public void setDateIfNull() {

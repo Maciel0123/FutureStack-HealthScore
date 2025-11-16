@@ -1,4 +1,4 @@
-package futureStack.futureStack.Chat;
+package futureStack.futureStack.chat;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
