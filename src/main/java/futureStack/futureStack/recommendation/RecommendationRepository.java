@@ -8,7 +8,4 @@ import java.util.List;
 
 @Repository
 public interface RecommendationRepository extends JpaRepository<RecommendationModel, Long> {
-    List<RecommendationModel> findByUserId(Long userId);
-
-    RecommendationModel findByCheckInId(Long checkInId);
 }

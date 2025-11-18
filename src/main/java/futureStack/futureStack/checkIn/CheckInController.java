@@ -1,11 +1,8 @@
 package futureStack.futureStack.checkIn;
 
 import futureStack.futureStack.users.User;
-import futureStack.futureStack.users.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -23,9 +20,6 @@ public class CheckInController {
 
     @Autowired
     private CheckInService checkInService;
-
-    @Autowired
-    private UserRepository userRepository;
 
     @Autowired
     private WScoreCalculator calculator;
@@ -142,6 +136,34 @@ public class CheckInController {
         Double avg = checkInService.getWeeklyAverage(user.getId());
         return ResponseEntity.ok(avg != null ? avg : 0.0);
     }
+
+    @GetMapping("/dashboard/humor-distribution")
+    public ResponseEntity<?> getHumorDistribution(@AuthenticationPrincipal User user) {
+        var stats = checkInService.getHumorDistribution(user.getId());
+        return ResponseEntity.ok(stats);
+    }
+
+    @GetMapping("/dashboard/energy")
+    public ResponseEntity<List<Integer>> getEnergyHistory(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(
+                checkInService.getLastEnergyValues(user.getId(), 7)
+        );
+    }
+
+    @GetMapping("/dashboard/focus")
+    public ResponseEntity<List<Integer>> getFocusHistory(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(
+                checkInService.getLastFocusValues(user.getId(), 7)
+        );
+    }
+
+    @GetMapping("/dashboard/sleep")
+    public ResponseEntity<List<Integer>> getSleepHistory(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(
+                checkInService.getLastSleepValues(user.getId(), 7)
+        );
+    }
+
 
     @GetMapping("/last")
     public ResponseEntity<CheckInResponseDTO> last(@AuthenticationPrincipal User user) {

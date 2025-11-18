@@ -4,20 +4,16 @@ import futureStack.futureStack.users.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Entity
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Data
 @Table(name = "check_ins")
 public class CheckInModel {
 
@@ -53,10 +49,4 @@ public class CheckInModel {
     private int hoursWorked;
 
     private int score;
-
-    @PrePersist
-    public void calculateScore() {
-        WScoreCalculator calculator = new WScoreCalculator();
-        this.score = calculator.calculateScore(mood, energy, sleep, focus, hoursWorked);
-    }
 }

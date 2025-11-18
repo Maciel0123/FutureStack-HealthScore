@@ -23,8 +23,6 @@ public class AuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-                System.out.println("passando pelo filtro");
-
                 var header = request.getHeader("Authorization");
                 if (header == null){
                     filterChain.doFilter(request, response);
@@ -50,6 +48,4 @@ public class AuthFilter extends OncePerRequestFilter {
         
     }
 
-
-    
 }

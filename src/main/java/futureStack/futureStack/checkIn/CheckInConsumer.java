@@ -29,6 +29,5 @@ public class CheckInConsumer {
                 recommendation
         );
 
-        System.out.println(" Recomendação processada com sucesso para check-in: " + event.getCheckInId());
     }
 }

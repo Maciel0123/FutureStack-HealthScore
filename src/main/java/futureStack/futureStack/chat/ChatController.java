@@ -12,10 +12,15 @@ public class ChatController {
     @Autowired
     private ChatBotService chatBotService;
 
+    @Autowired
+    private ChatBotWebSocketService chatBotWebSocketService;
+
     @PostMapping("/chat")
     public ResponseEntity<ChatResponseDTO> chat(@RequestBody ChatRequestDTO request) {
 
         String response = chatBotService.chat(request.message);
+
+        chatBotWebSocketService.sendChatMessage(response);
 
         return ResponseEntity.ok(new ChatResponseDTO(response));
     }

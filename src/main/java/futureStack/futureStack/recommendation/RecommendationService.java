@@ -1,12 +1,18 @@
 package futureStack.futureStack.recommendation;
 
+import futureStack.futureStack.checkIn.CheckInModel;
 import futureStack.futureStack.checkIn.CheckInRepository;
 import futureStack.futureStack.users.User;
 import futureStack.futureStack.users.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Service
 public class RecommendationService {
@@ -15,12 +21,14 @@ public class RecommendationService {
     private final CheckInRepository checkInRepository;
     private final RecommendationRepository recommendationRepository;
     private final UserRepository userRepository;
+    private final MessageSource messageSource;
 
-    public RecommendationService(ChatClient chatClient, CheckInRepository repo, RecommendationRepository recommendationRepository, UserRepository userRepository) {
+    public RecommendationService(ChatClient chatClient, CheckInRepository repo, RecommendationRepository recommendationRepository, UserRepository userRepository, MessageSource messageSource) {
         this.chatClient = chatClient;
         this.checkInRepository = repo;
         this.recommendationRepository = recommendationRepository;
         this.userRepository = userRepository;
+        this.messageSource = messageSource;
     }
 
     public String generateDailyRecommendation(User user) {
@@ -30,35 +38,24 @@ public class RecommendationService {
                 .orElse(null);
 
         if (lastCheckin == null) {
-            return "Ainda não encontrei check-ins seus. Faça seu primeiro check-in para gerar uma recomendação personalizada.";
+            return messageSource.getMessage(
+                    "recommendation.noCheckins",
+                    null,
+                    LocaleContextHolder.getLocale()
+            );
         }
 
-        String prompt = """
-        Você é um assistente especializado em bem-estar corporativo. Gere uma recomendação curta, clara e motivadora baseada nos dados:
-        
-        Humor: %d
-        Energia: %d
-        Sono: %d
-        Foco: %d
-        Carga de Trabalho: %d
-        Score: %d
-        
-        INSTRUÇÕES OBRIGATÓRIAS:
-        - Responda em texto corrido, com 3 a 5 frases.
-        - Não use tabelas, listas, tópicos, negrito, títulos ou markdown.
-        - Não repita os valores numéricos informados (como 7/10 ou 8/10).
-        - Mantenha tom profissional, simples e acolhedor.
-        - Dê apenas UMA recomendação prática no final.
-        - Retorne somente o texto final, nada além disso.
-        
-        Agora gere a resposta.
-        """.formatted(
-                lastCheckin.getMood(),
-                lastCheckin.getEnergy(),
-                lastCheckin.getSleep(),
-                lastCheckin.getFocus(),
-                lastCheckin.getHoursWorked(),
-                lastCheckin.getScore()
+        String prompt = messageSource.getMessage(
+                "ai.dailyPrompt",
+                new Object[]{
+                        lastCheckin.getMood(),
+                        lastCheckin.getEnergy(),
+                        lastCheckin.getSleep(),
+                        lastCheckin.getFocus(),
+                        lastCheckin.getHoursWorked(),
+                        lastCheckin.getScore()
+                },
+                LocaleContextHolder.getLocale()
         );
 
         return chatClient
@@ -72,20 +69,11 @@ public class RecommendationService {
 
     public String generateRecommendationFromScore(Integer score) {
 
-        String prompt = """
-        Gere uma recomendação curta, clara e motivadora baseada no score de bem-estar informado:
-        
-        Score: %d
-        
-        INSTRUÇÕES:
-        - Responda em 3 a 5 frases.
-        - Texto corrido.
-        - Não use títulos, tópicos, listas ou markdown.
-        - Não repita o valor numérico do score.
-        - Dê apenas uma recomendação prática no final.
-        
-        Agora gere a resposta.
-        """.formatted(score);
+        String prompt = messageSource.getMessage(
+                "ai.scorePrompt",
+                new Object[]{ score },
+                LocaleContextHolder.getLocale()
+        );
 
         return chatClient
                 .prompt()
@@ -110,6 +98,50 @@ public class RecommendationService {
         model.setText(text);
 
         recommendationRepository.save(model);
+    }
+
+    public String generateMonthlySummary(User user) {
+
+        LocalDate thirtyDaysAgo = LocalDate.now().minusDays(30);
+
+        List<CheckInModel> list =
+                checkInRepository.findByUser_IdAndDateAfter(user.getId(), thirtyDaysAgo);
+
+        if (list.isEmpty()) {
+            return messageSource.getMessage("monthly.noData", null, LocaleContextHolder.getLocale());
+        }
+
+        StringBuilder data = new StringBuilder();
+        for (CheckInModel c : list) {
+            data.append("""
+                Dia %s:
+                humor=%d, energia=%d, sono=%d, foco=%d, carga=%d, score=%d
+
+                """.formatted(
+                    c.getDate(),
+                    c.getMood(),
+                    c.getEnergy(),
+                    c.getSleep(),
+                    c.getFocus(),
+                    c.getHoursWorked(),
+                    c.getScore()
+            ));
+        }
+
+        String prompt = messageSource.getMessage(
+                "ai.monthlyPrompt",
+                new Object[]{data.toString()},
+                LocaleContextHolder.getLocale()
+        );
+
+        return chatClient
+                .prompt()
+                .user(prompt)
+                .options(OpenAiChatOptions.builder()
+                        .model("openai/gpt-oss-20b")
+                        .build())
+                .call()
+                .content();
     }
 
 }

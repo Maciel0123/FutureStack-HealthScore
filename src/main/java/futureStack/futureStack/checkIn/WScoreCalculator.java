@@ -1,9 +1,17 @@
 package futureStack.futureStack.checkIn;
 
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
 public class WScoreCalculator {
+
+    private final MessageSource messageSource;
+
+    public WScoreCalculator(MessageSource messageSource) {
+        this.messageSource = messageSource;
+    }
 
     public int calculateScore(int mood, int energy, int sleep, int focus, int hoursWorked) {
         double moodWeight = 0.25;
@@ -39,10 +47,14 @@ public class WScoreCalculator {
     }
 
     public String getScoreMessage(int score) {
-        if (score >= 800) return "Excelente! Seu bem-estar está ótimo!";
-        if (score >= 600) return "Bom! Continue mantendo o equilíbrio.";
-        if (score >= 400) return "Atenção! Considere fazer pausas e descansar.";
-        if (score >= 200) return "Cuidado! Reorganize sua rotina e procure descanso.";
-        return "Crítico! Recomendamos buscar apoio e descanso.";
+        String key;
+
+        if (score >= 800) key = "score.excellent";
+        else if (score >= 600) key = "score.good";
+        else if (score >= 400) key = "score.attention";
+        else if (score >= 200) key = "score.warning";
+        else key = "score.critical";
+
+        return messageSource.getMessage(key, null, LocaleContextHolder.getLocale());
     }
 }
