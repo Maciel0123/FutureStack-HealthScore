@@ -23,6 +23,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/users/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/login").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/topic/**").permitAll()
+                        .requestMatchers("/app/**").permitAll()
                         .anyRequest().authenticated())
                 .cors(Customizer.withDefaults())
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)

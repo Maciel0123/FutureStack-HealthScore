@@ -60,6 +60,12 @@ public class CheckInController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @GetMapping("/today/exist")
+    public ResponseEntity<Boolean> hasToday(@AuthenticationPrincipal User user) {
+        boolean exists = checkInService.hasCheckInToday(user.getId());
+        return ResponseEntity.ok(exists);
+    }
+
     @GetMapping
     public ResponseEntity<Page<CheckInResponseDTO>> list(
             @AuthenticationPrincipal User user,
@@ -162,6 +168,14 @@ public class CheckInController {
         return ResponseEntity.ok(
                 checkInService.getLastSleepValues(user.getId(), 7)
         );
+    }
+    @GetMapping("/dates")
+    public ResponseEntity<List<String>> getCheckInDates(@AuthenticationPrincipal User user) {
+        var list = checkInService.getUserCheckIns(user.getId());
+        var dates = list.stream()
+                .map(c -> c.getDate().toString())
+                .toList();
+        return ResponseEntity.ok(dates);
     }
 
 

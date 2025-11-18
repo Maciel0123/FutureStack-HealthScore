@@ -98,6 +98,10 @@ public class CheckInService {
         return repository.findByUser_IdOrderByDateDesc(userId, pageable);
     }
 
+    public boolean hasCheckInToday(Long userId) {
+        return repository.findByUser_IdAndDate(userId, LocalDate.now()).isPresent();
+    }
+
     @Cacheable(value = "weekly_avg", key = "#userId")
     public Double getWeeklyAverage(Long userId) {
         return repository.findAverageScoreSince(userId, LocalDate.now().minusDays(7));
