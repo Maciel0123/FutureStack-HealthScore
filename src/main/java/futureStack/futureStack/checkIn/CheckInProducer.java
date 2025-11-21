@@ -1,10 +1,12 @@
 package futureStack.futureStack.checkIn;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import static futureStack.futureStack.config.RabbitConfig.*;
 
+@Profile("dev")
 @Component
 public class CheckInProducer {
 
