@@ -24,7 +24,7 @@ public class CheckInController {
     @Autowired
     private WScoreCalculator calculator;
 
-    @Autowired
+    @Autowired(required = false)
     private CheckInProducer producer;
 
     @PostMapping
@@ -34,14 +34,16 @@ public class CheckInController {
     ) {
         var saved = checkInService.createCheckIn(user, dto);
 
-        producer.sendCheckInEvent(
-                new CheckInEventDTO(
-                        saved.getUser().getId(),
-                        saved.getId(),
-                        saved.getScore(),
-                        saved.getDate().toString()
-                )
-        );
+        if (producer != null) {
+                producer.sendCheckInEvent(
+                        new CheckInEventDTO(
+                                saved.getUser().getId(),
+                                saved.getId(),
+                                saved.getScore(),
+                                saved.getDate().toString()
+                        )
+                );
+        }
 
         var message = calculator.getScoreMessage(saved.getScore());
 
