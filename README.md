@@ -38,7 +38,7 @@ O FutureStack – Health Score API é uma plataforma que calcula um índice de b
 ### 🔐 **Autenticação**
 
 #### **Cadastrar Usuário**
-**POST** `/api/users`
+**POST** `/users`
 
 **Request:**
 ```json
@@ -51,7 +51,7 @@ O FutureStack – Health Score API é uma plataforma que calcula um índice de b
 ```
 
 #### **Login**
-**POST** `/api/auth/login`
+**POST** `/login`
 
 **Request:**
 ```json
@@ -90,6 +90,12 @@ Authorization: Bearer SEU_TOKEN_JWT
 }
 ```
 
+#### **Deletar Usuário**
+**DELETE** `/users/{id}`
+
+#### **Listar Usuários**
+**GET** `/users`
+
 ---
 
 ### 📊 **Check-ins e Monitoramento**
@@ -122,6 +128,25 @@ Authorization: Bearer SEU_TOKEN_JWT
 "message": "Bom! Continue mantendo o equil�brio."
 }
 ```
+
+#### **Listar Check-in**
+**GET** `/checkins`
+
+#### **Atualizar Check-in**
+**PUT** `/checkins/{id}`
+
+**Request:**
+```json
+{
+  "mood": 8,
+  "energy": 8,
+  "sleep": 6,
+  "focus": 8,
+  "hoursWorked": 7
+}
+```
+#### **Deletar Check-in**
+**DELETE** `/checkins/{id}`
 
 #### **Último Check-in**
 **GET** `/checkins/last`
